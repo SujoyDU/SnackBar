@@ -6,9 +6,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.UserProfile
-        fields = (
-            'id', 'name', 'job_title', 'organization_name', 'phone_country_code', 'phone_number', 'email', 'password',
-            'picture', 'created_on')
+        fields = ('first_name','last_name','email', 'password','avatar')
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, data):
@@ -31,25 +29,21 @@ class UserProfileSerializer(serializers.ModelSerializer):
                 # data.update({'name': originalOwner})
         return data
 
-    def create(self, validated_data):
+    def create(self, data):
         """ Create and return a new user"""
         user = models.UserProfile(
-            name=validated_data['name'],
-            email=validated_data['email'],
-            # picture=validated_data['picture']
-
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            email=data['email'],
+            avatar=data['avatar']
         )
-
-        user.set_password(validated_data['password'])
-
+        user.set_password(data['password'])
         user.save()
 
         return user
 
     def update(self, instance, validated_data):
-
         models.UserProfile.objects.filter(pk=instance.id).update(**validated_data)
-
         user = models.UserProfile.objects.get(pk=instance.id)
         return user
 
